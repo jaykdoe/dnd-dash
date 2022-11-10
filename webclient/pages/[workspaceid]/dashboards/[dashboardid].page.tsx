@@ -7,12 +7,15 @@ import { useDashboardFetch } from "@core/hooks/data/use-dashboard-fetch";
 import Link from "next/link";
 import { MetricChart } from "@webclient/components/Dashboards/MetricChart";
 
-function DashboardInner(props) {
-  const { workspaceid, dashboardid } = props;
+type Props = {
+  workspaceid: string[] | string;
+  dashboardid: string[] | string;
+};
 
+const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
   const { isError, error, isSuccess, status, data } = useDashboardFetch(
     workspaceid as string,
-    dashboardid as string,
+    dashboardid as string
   );
 
   if (isError) {
@@ -25,20 +28,16 @@ function DashboardInner(props) {
 
   return (
     <>
-      <Title
-        icon={data.icon}
-        title={data.title}
-        subtitle={data.description}
-      />
+      <Title icon={data.icon} title={data.title} subtitle={data.description} />
 
       <div className="grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
         {Object.entries(data.metrics).map(([metricId, metric]) => {
-          return <MetricChart key={metricId} metric={metric} />;
+          return <MetricChart key={metricId} metric={metric as TYPES.Metric} />;
         })}
       </div>
     </>
   );
-}
+};
 
 export default function DashboardPage() {
   const router = useRouter();

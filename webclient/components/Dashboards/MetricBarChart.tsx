@@ -17,13 +17,12 @@ ChartJS.register(
   LinearScale,
   BarElement,
   Tooltip,
-  Legend,
+  Legend
 );
 
-function MetricBarChart(props) {
+const MetricBarChart = ({ metric }: { metric: TYPES.Metric }) => {
   const { theme } = useTheme();
 
-  const { metric } = props;
   const color = colors[metric.color];
 
   let delayed;
@@ -52,9 +51,7 @@ function MetricBarChart(props) {
           drawBorder: false,
         },
         ticks: {
-          color: (theme === "dark")
-            ? "rgb(255, 255, 255)"
-            : "rgb(128, 128, 128)",
+          color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(128, 128, 128)",
         },
       },
       y: {
@@ -100,9 +97,10 @@ function MetricBarChart(props) {
   const dataColors = createPalette(color.accent, metric.data.length);
 
   const data = {
-    labels: metric.data.map((item) =>
-      // dateFormatter(item.time)
-      item.name
+    labels: metric.data.map(
+      (item) =>
+        // dateFormatter(item.time)
+        item.name
     ),
     datasets: [
       {
@@ -115,6 +113,6 @@ function MetricBarChart(props) {
   };
 
   return <Bar options={options} data={data} />;
-}
+};
 
 export { MetricBarChart, MetricBarChart as default };

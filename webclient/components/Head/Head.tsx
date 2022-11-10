@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import Head from "next/head";
 
 export type HeadProps = {
@@ -8,8 +7,11 @@ export type HeadProps = {
   children?: React.ReactNode;
 };
 
-const HeadComponent = (props: HeadProps) => {
-  const { title, description, children } = props;
+const HeadComponent: React.FC<HeadProps> = ({
+  title,
+  description,
+  children,
+}) => {
   return (
     <Head>
       <title key="title">{title}</title>

@@ -6,14 +6,12 @@ export type LayoutProps = {
   children?: React.ReactNode;
 };
 
-const LayoutComponent = (props: LayoutProps) => {
+const LayoutComponent: React.FC<LayoutProps> = ({ title, children }) => {
   return (
     <>
-      <Header title={props.title} />
+      <Header title={title} />
 
-      <div className="container mx-auto p-4">
-        {props.children}
-      </div>
+      <div className="container mx-auto p-4">{children}</div>
     </>
   );
 };
