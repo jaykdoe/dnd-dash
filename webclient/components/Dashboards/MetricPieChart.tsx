@@ -5,15 +5,19 @@ import { colors, createPalette } from "@core/presets/colors";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function MetricPieChart(props) {
+type Props = {
+  metric: TYPES.Metric;
+  size: string;
+};
+
+const MetricPieChart = ({ metric, size }: Props) => {
   const { theme } = useTheme();
 
-  const { metric } = props;
   const color = colors[metric.color];
 
   const options = {
     responsive: true,
-    maintainAspectRatio: (["small"].includes(props.size) ? false : true),
+    maintainAspectRatio: ["small"].includes(size) ? false : true,
     aspectRatio: 2,
     cutout: "85%",
     layout: {
@@ -27,9 +31,7 @@ function MetricPieChart(props) {
       legend: {
         position: "right" as const,
         labels: {
-          color: (theme === "dark")
-            ? "rgb(255, 255, 255)"
-            : "rgb(128, 128, 128)",
+          color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(128, 128, 128)",
         },
       },
     },
@@ -38,9 +40,10 @@ function MetricPieChart(props) {
   const dataColors = createPalette(color.accent, metric.data.length);
 
   const data = {
-    labels: metric.data.map((item) =>
-      // dateFormattter(item.time)
-      item.name
+    labels: metric.data.map(
+      (item) =>
+        // dateFormattter(item.time)
+        item.name
     ),
     datasets: [
       {
@@ -55,6 +58,6 @@ function MetricPieChart(props) {
   };
 
   return <Doughnut options={options} data={data} />;
-}
+};
 
 export { MetricPieChart, MetricPieChart as default };

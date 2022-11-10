@@ -9,17 +9,10 @@ import { MetricLineChart } from "./MetricLineChart";
 import { MetricBarChart } from "./MetricBarChart";
 import { MetricTableChart } from "./MetricTableChart";
 import { MetricSingleValueChart } from "./MetricSingleValueChart";
+import { CHART_TYPE } from "@webclient/constants/enums";
 
-function GetParametersByChartType(chartType) {
-  if (chartType === "BAR_CHART") {
-    return {
-      component: MetricBarChart,
-      showGoal: true,
-      showDate: false,
-    };
-  }
-
-  if (chartType === "PIE_CHART") {
+const GetParametersByChartType = (chartType: TYPES.ChartType) => {
+  if (chartType === CHART_TYPE.PIE_CHART) {
     return {
       component: MetricPieChart,
       showGoal: true,
@@ -27,7 +20,15 @@ function GetParametersByChartType(chartType) {
     };
   }
 
-  if (chartType === "LINE_CHART") {
+  if (chartType === CHART_TYPE.BAR_CHART) {
+    return {
+      component: MetricBarChart,
+      showGoal: true,
+      showDate: false,
+    };
+  }
+
+  if (chartType === CHART_TYPE.LINE_CHART) {
     return {
       component: MetricLineChart,
       showGoal: true,
@@ -35,7 +36,7 @@ function GetParametersByChartType(chartType) {
     };
   }
 
-  if (chartType === "TABLE_CHART") {
+  if (chartType === CHART_TYPE.TABLE_CHART) {
     return {
       component: MetricTableChart,
       showGoal: false,
@@ -52,14 +53,13 @@ function GetParametersByChartType(chartType) {
   }
 
   throw new Error(`invalid chart type: {chartType}`);
-}
+};
 
-function MetricChart(props) {
-  const { metric } = props;
+const MetricChart = ({ metric }: { metric: TYPES.Metric }) => {
   const params = GetParametersByChartType(metric.chart_type);
 
   const sizes = ["small", "medium", "large"];
-  const [size, setSize] = useState(props.metric.size);
+  const [size, setSize] = useState(metric.size);
 
   const resizeClick = (e) => {
     setSize(sizes[(sizes.indexOf(size) + 1) % sizes.length]);
@@ -71,16 +71,14 @@ function MetricChart(props) {
     <div
       className={classNames([
         "flex flex-col h-full shadow-sm dark:bg-slate-800 bg-white rounded-lg p-4 group",
-        (size === "medium") && "col-span-2 row-span-1",
-        (size === "large") && "col-span-3 row-span-2",
+        size === "medium" && "col-span-2 row-span-1",
+        size === "large" && "col-span-3 row-span-2",
       ])}
     >
       <div className="flex justify-between">
         <div>
           <Conditional if={params.showGoal}>
-            <h3 className="text-lg">
-              {props.metric.goal}
-            </h3>
+            <h3 className="text-lg">{metric.goal}</h3>
           </Conditional>
           <h3
             className={classNames([
@@ -88,13 +86,11 @@ function MetricChart(props) {
               `text-{color.hardClass}`,
             ])}
           >
-            {props.metric.icon} {props.metric.title}
+            {metric.icon} {metric.title}
           </h3>
           <Conditional if={params.showDate}>
             <h3 className="mt-2 text-base text-gray-400">
-              {dateFormatter(
-                props.metric.sys.updated_at ?? props.metric.sys.created_at,
-              )}
+              {dateFormatter(metric.sys?.updated_at ?? metric.sys?.created_at)}
             </h3>
           </Conditional>
         </div>
@@ -112,11 +108,11 @@ function MetricChart(props) {
 
       <div className="grow flex flex-col justify-center">
         <div>
-          <params.component metric={props.metric} size={size} />
+          <params.component metric={metric} size={size} />
         </div>
       </div>
     </div>
   );
-}
+};
 
 export { MetricChart, MetricChart as default };

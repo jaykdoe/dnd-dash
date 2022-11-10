@@ -21,13 +21,12 @@ ChartJS.register(
   LineElement,
   Tooltip,
   Legend,
-  Filler,
+  Filler
 );
 
-function MetricLineChart(props) {
+const MetricLineChart = ({ metric }: { metric: TYPES.Metric }) => {
   const { theme } = useTheme();
 
-  const { metric } = props;
   const color = colors[metric.color];
 
   const options = {
@@ -39,7 +38,7 @@ function MetricLineChart(props) {
       easing: "linear" as const,
     },
     interaction: {
-      mode: "index",
+      mode: "index" as any,
       intersect: false,
     },
     scales: {
@@ -49,16 +48,14 @@ function MetricLineChart(props) {
           drawBorder: false,
         },
         ticks: {
-          color: (theme === "dark")
-            ? "rgb(255, 255, 255)"
-            : "rgb(128, 128, 128)",
+          color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(128, 128, 128)",
         },
       },
       y: {
         grid: {
           // display: false,
           drawBorder: false,
-          color: (theme === "dark") ? "rgb(50, 50, 50)" : "rgb(245, 245, 245)",
+          color: theme === "dark" ? "rgb(50, 50, 50)" : "rgb(245, 245, 245)",
         },
         ticks: {
           display: false,
@@ -88,9 +85,10 @@ function MetricLineChart(props) {
   };
 
   const data = {
-    labels: metric.data.map((item) =>
-      // dateFormatter(item.time)
-      item.name
+    labels: metric.data.map(
+      (item) =>
+        // dateFormatter(item.time)
+        item.name
     ),
     datasets: [
       {
@@ -106,9 +104,8 @@ function MetricLineChart(props) {
             pointBorderColor: "transparent",
             borderWidth: 13,
             pointHoverRadius: 10,
-            pointHoverBackgroundColor: (theme === "dark")
-              ? "rgb(30, 41, 59)"
-              : "rgb(255, 255, 255)",
+            pointHoverBackgroundColor:
+              theme === "dark" ? "rgb(30, 41, 59)" : "rgb(255, 255, 255)",
             pointHoverBorderWidth: 3,
             pointHoverBorderColor: color.accent.string(),
           },
@@ -123,6 +120,6 @@ function MetricLineChart(props) {
   };
 
   return <Line options={options} data={data} />;
-}
+};
 
 export { MetricLineChart, MetricLineChart as default };
