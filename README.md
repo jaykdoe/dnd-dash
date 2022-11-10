@@ -9,4 +9,4 @@
   - New reviewable commits pushed to a matching branch will dismiss pull request review approvals.
 
 ###### Development Branch Strategy
-  Prefixes: feature/, bugfix/, hotfix/
+  - Prefixes: feature/, bugfix/, hotfix/
