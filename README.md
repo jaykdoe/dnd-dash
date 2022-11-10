@@ -10,3 +10,4 @@
 
 ###### Development Branch Strategy
   - Prefixes: feature/, bugfix/, hotfix/
+  - We have to create a new branch for each task.
