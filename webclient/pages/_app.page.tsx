@@ -2,6 +2,8 @@ import "@webclient/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import { fetcher } from "@core/services/fetcher/index";
 import { mockDashboardFetch } from "@core/hooks/data/use-dashboard-fetch";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 // Initialize fetcher
 fetcher.setBaseUrl(process.env.NEXT_PUBLIC_FRONTEND_BASE_URL);
@@ -15,9 +17,11 @@ if (!("fetcher" in globalThis)) {
 
 function DatapadApp({ Component, pageProps }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light">
-      <Component {...pageProps} />
-    </ThemeProvider>
+    <DndProvider backend={HTML5Backend}>
+      <ThemeProvider attribute="class" defaultTheme="light">
+        <Component {...pageProps} />
+      </ThemeProvider>
+    </DndProvider>
   );
 }
 

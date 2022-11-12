@@ -8,6 +8,7 @@ declare module TYPES {
     | undefined;
 
   export type Metric = {
+    id?: number;
     title: string;
     size: string;
     icon: string;
