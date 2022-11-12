@@ -1,5 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import update from "immutability-helper";
 import Layout from "@webclient/components/Layout/Layout";
 import Button from "@webclient/components/UI/Button/Button";
 import Title from "@webclient/components/UI/Title/Title";
@@ -18,6 +20,28 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
     dashboardid as string
   );
 
+  const [card, setCards] = useState<TYPES.Metric[]>();
+
+  useEffect(() => {
+    if (data?.metrics) {
+      const newData = data.metrics.map((item: TYPES.Metric, i: number) => {
+        return { id: i + 1, ...item };
+      });
+      setCards(newData);
+    }
+  }, [data]);
+
+  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
+    setCards((prevCards: TYPES.Metric[]) =>
+      update(prevCards, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, prevCards[dragIndex] as TYPES.Metric],
+        ],
+      })
+    );
+  }, []);
+
   if (isError) {
     return <>error: {JSON.stringify(error)}</>;
   }
@@ -26,13 +50,23 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
     return <>status: {status}...</>;
   }
 
+  console.log(card);
+
   return (
     <>
       <Title icon={data.icon} title={data.title} subtitle={data.description} />
 
       <div className="grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-        {Object.entries(data.metrics).map(([metricId, metric]) => {
-          return <MetricChart key={metricId} metric={metric as TYPES.Metric} />;
+        {card?.map((item, i) => {
+          return (
+            <MetricChart
+              key={item.id}
+              metric={item}
+              moveCard={moveCard}
+              id={item.id}
+              index={i}
+            />
+          );
         })}
       </div>
     </>
