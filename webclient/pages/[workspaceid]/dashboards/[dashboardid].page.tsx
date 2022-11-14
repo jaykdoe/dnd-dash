@@ -58,11 +58,9 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
 
   const handleRemove = useCallback(
     (index: number) => {
-      console.log("test");
       const array = metrics;
       if (index > -1) {
         array.splice(index, 1);
-        console.log(array);
         setMetrics([...array]);
       }
     },
@@ -119,8 +117,6 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
   if (!isSuccess || data === undefined) {
     return <>status: {status}...</>;
   }
-
-  console.log(metrics);
 
   return (
     <div>

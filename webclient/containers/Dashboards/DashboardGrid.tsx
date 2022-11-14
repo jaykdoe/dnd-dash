@@ -105,8 +105,6 @@ export const DashboardGrid = ({
   const opacity = isDragging ? 0 : 1;
   drag(drop(ref));
 
-  console.log(size);
-
   return (
     <div
       ref={ref}
