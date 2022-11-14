@@ -1,5 +1,6 @@
 {
   "scripts": {
-    "postinstall": "cd ./webclient && npm install && cd .. && cd ./core && npm install"
+    "postinstall": "cd ./webclient && npm install && cd .. && cd ./core && npm install",
+    "postrun": "cd ./webclient && npm run dev"
   }
 }
