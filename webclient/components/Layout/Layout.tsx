@@ -11,7 +11,9 @@ const LayoutComponent: React.FC<LayoutProps> = ({ title, children }) => {
     <>
       <Header title={title} />
 
-      <div className="container mx-auto p-4">{children}</div>
+      <div className="relative h-screen">
+        <div className="container mx-auto p-4">{children}</div>
+      </div>
     </>
   );
 };

@@ -11,9 +11,15 @@ type CardProps = {
   children: React.ReactNode;
   data: TYPES.Metric;
   isDrag: (isDragging: Boolean) => void;
+  onClick: (item: { data: TYPES.Metric }) => void;
 };
 
-export const MetricsInModal = ({ children, data, isDrag }: CardProps) => {
+export const MetricsInModal = ({
+  children,
+  data,
+  isDrag,
+  onClick,
+}: CardProps) => {
   const [isDraged, setIsDraged] = useState<Boolean>(false);
   const [{ opacity }, drag] = useDrag(
     () => ({
@@ -41,7 +47,14 @@ export const MetricsInModal = ({ children, data, isDrag }: CardProps) => {
   }, [isDrag, isDraged]);
 
   return (
-    <div ref={drag} style={{ ...style, opacity }}>
+    <div
+      ref={drag}
+      style={{ ...style, opacity }}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick({ data: data });
+      }}
+    >
       {children}
     </div>
   );
