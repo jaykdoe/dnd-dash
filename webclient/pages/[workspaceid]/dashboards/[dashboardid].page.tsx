@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import styled from "styled-components";
 import update from "immutability-helper";
 import Layout from "@webclient/components/Layout/Layout";
 import Button from "@webclient/components/UI/Button/Button";
@@ -8,10 +9,20 @@ import Title from "@webclient/components/UI/Title/Title";
 import { useDashboardFetch } from "@core/hooks/data/use-dashboard-fetch";
 import Link from "next/link";
 import { MetricChart } from "@webclient/components/Dashboards/MetricChart";
+import { AddNewKpiModal } from "@webclient/containers/Dashboards/AddNewKpiModal";
+import { useDrop } from "react-dnd";
+import { Identifier } from "dnd-core";
+import { DashboardGrid } from "@webclient/containers/Dashboards/DashboardGrid";
 
 type Props = {
   workspaceid: string[] | string;
   dashboardid: string[] | string;
+};
+
+type DragItem = {
+  index: number;
+  id: number;
+  type: string;
 };
 
 const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
@@ -20,27 +31,58 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
     dashboardid as string
   );
 
-  const [card, setCards] = useState<TYPES.Metric[]>();
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [metrics, setMetrics] = useState<TYPES.Metric[]>();
+  const [isModal, setModal] = useState<Boolean>(false);
 
   useEffect(() => {
     if (data?.metrics) {
-      const newData = data.metrics.map((item: TYPES.Metric, i: number) => {
-        return { id: i + 1, ...item };
+      const newData = data.metrics.map((metric: TYPES.Metric, i: number) => {
+        return { ...metric, id: i + 1 };
       });
-      setCards(newData);
+      setMetrics(newData);
     }
   }, [data]);
 
-  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
-    setCards((prevCards: TYPES.Metric[]) =>
-      update(prevCards, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, prevCards[dragIndex] as TYPES.Metric],
-        ],
-      })
-    );
-  }, []);
+  const handleDrop = useCallback(
+    (item: any) => {
+      if (isModal) {
+        setMetrics([...metrics, item.data]);
+      }
+    },
+    [metrics, isModal]
+  );
+
+  const [{ handlerId }, drop] = useDrop<
+    DragItem,
+    void,
+    { handlerId: Identifier | null }
+  >({
+    accept: "card",
+    drop: handleDrop as any,
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      };
+    },
+  });
+
+  const moveMetric = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      if (!isModal) {
+        setMetrics((prevCards: TYPES.Metric[]) =>
+          update(prevCards, {
+            $splice: [
+              [dragIndex, 1],
+              [hoverIndex, 0, prevCards[dragIndex] as TYPES.Metric],
+            ],
+          })
+        );
+      }
+    },
+    [isModal]
+  );
 
   if (isError) {
     return <>error: {JSON.stringify(error)}</>;
@@ -50,26 +92,50 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
     return <>status: {status}...</>;
   }
 
-  console.log(card);
-
   return (
-    <>
-      <Title icon={data.icon} title={data.title} subtitle={data.description} />
+    <div>
+      <div className="flex justify-between items-center">
+        <Title
+          icon={data.icon}
+          title={data.title}
+          subtitle={data.description}
+        />
+        <div>
+          <AddNewKpiButton
+            title="+ Add New KPI"
+            className="datapad-button"
+            onClick={() => setModal(!isModal)}
+          />
+        </div>
+      </div>
 
-      <div className="grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-        {card?.map((item, i) => {
+      <div
+        className="grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
+        ref={drop}
+        data-handler-id={handlerId}
+      >
+        {metrics?.map((metric, i) => {
           return (
-            <MetricChart
-              key={item.id}
-              metric={item}
-              moveCard={moveCard}
-              id={item.id}
+            <DashboardGrid
+              key={i}
+              moveMetric={moveMetric}
+              id={metric.id}
               index={i}
-            />
+            >
+              <MetricChart metric={metric} />
+            </DashboardGrid>
           );
         })}
       </div>
-    </>
+
+      {isModal ? (
+        <AddNewKpiModal
+          closeClick={() => setModal(!isModal)}
+          isModal={isModal}
+          workspaceid={String(workspaceid)}
+        />
+      ) : null}
+    </div>
   );
 };
 
@@ -115,3 +181,17 @@ export default function DashboardPage() {
     </>
   );
 }
+
+const AddNewKpiButton = styled(Button)`
+  color: #5b4ccc;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  &:hover {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+  }
+`;

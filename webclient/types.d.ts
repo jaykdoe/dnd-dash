@@ -18,6 +18,7 @@ declare module TYPES {
     goal: number;
     value: number;
     source: null | string;
+    is_drag?: boolean;
     header?: {
       title: string;
       dimension: string;
