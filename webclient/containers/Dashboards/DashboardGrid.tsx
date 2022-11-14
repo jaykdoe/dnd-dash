@@ -1,5 +1,6 @@
+import classNames from "@webclient/../core/src/react/class-names";
 import type { Identifier, XYCoord } from "dnd-core";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 
 const style = {
@@ -8,25 +9,27 @@ const style = {
   cursor: "move",
 };
 
-export interface CardProps {
+type DashboardProps = {
   id: any;
   children: React.ReactNode;
   index: number;
   moveMetric: (dragIndex: number, hoverIndex: number) => void;
-}
+  size?: string;
+};
 
-interface DragItem {
+type DragItem = {
   index: number;
   id: string;
   type: string;
-}
+};
 
 export const DashboardGrid = ({
   id,
   children,
   index,
   moveMetric,
-}: CardProps) => {
+  size,
+}: DashboardProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
@@ -103,7 +106,16 @@ export const DashboardGrid = ({
   drag(drop(ref));
 
   return (
-    <div ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
+    <div
+      ref={ref}
+      style={{ ...style, opacity }}
+      data-handler-id={handlerId}
+      className={classNames([
+        size === "small" && "col-span-1 row-span-1",
+        size === "medium" && "col-span-2 row-span-1",
+        size === "large" && "col-span-3 row-span-2",
+      ])}
+    >
       {children}
     </div>
   );

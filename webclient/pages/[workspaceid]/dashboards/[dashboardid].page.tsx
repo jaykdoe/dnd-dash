@@ -9,7 +9,7 @@ import Title from "@webclient/components/UI/Title/Title";
 import { useDashboardFetch } from "@core/hooks/data/use-dashboard-fetch";
 import Link from "next/link";
 import { MetricChart } from "@webclient/components/Dashboards/MetricChart";
-import { AddNewKpiModal } from "@webclient/containers/Dashboards/AddNewKpiModal";
+import { AddNewKpiMenu } from "@webclient/containers/Dashboards/AddNewKpiMenu";
 import { useDrop } from "react-dnd";
 import { Identifier } from "dnd-core";
 import { DashboardGrid } from "@webclient/containers/Dashboards/DashboardGrid";
@@ -46,12 +46,25 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
   }, [data]);
 
   const handleDrop = useCallback(
-    (item: any) => {
+    (item: { data: TYPES.Metric }) => {
+      const newItem = { ...item.data, id: metrics.length + 1 };
+
       if (isModal) {
-        setMetrics([...metrics, item.data]);
+        setMetrics([...metrics, newItem]);
       }
     },
     [metrics, isModal]
+  );
+
+  const handleRemove = useCallback(
+    (index: number) => {
+      const array = metrics;
+      if (index > -1) {
+        array.splice(index, 1);
+        setMetrics([...array]);
+      }
+    },
+    [metrics]
   );
 
   const [{ handlerId }, drop] = useDrop<
@@ -83,6 +96,19 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
     },
     [isModal]
   );
+
+  const sizes = ["small", "medium", "large"];
+
+  const resizeClick = (e, metric: TYPES.Metric) => {
+    e.preventDefault();
+    const newMetricSizes = metrics.map((item) => {
+      if (item.id === metric.id) {
+        item.size = sizes[(sizes.indexOf(metric.size) + 1) % sizes.length];
+      }
+      return item;
+    });
+    setMetrics(newMetricSizes);
+  };
 
   if (isError) {
     return <>error: {JSON.stringify(error)}</>;
@@ -121,16 +147,23 @@ const DashboardInner = ({ workspaceid, dashboardid }: Props) => {
               moveMetric={moveMetric}
               id={metric.id}
               index={i}
+              size={metric.size}
             >
-              <MetricChart metric={metric} />
+              <MetricChart
+                metric={metric}
+                resizeClick={resizeClick}
+                handleRemove={handleRemove}
+                index={i}
+              />
             </DashboardGrid>
           );
         })}
       </div>
 
       {isModal ? (
-        <AddNewKpiModal
+        <AddNewKpiMenu
           closeClick={() => setModal(!isModal)}
+          onClick={handleDrop}
           isModal={isModal}
           workspaceid={String(workspaceid)}
         />

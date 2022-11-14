@@ -7,12 +7,14 @@ type Props = {
   closeClick: () => void;
   isModal?: Boolean;
   workspaceid: string;
+  onClick: (item: { data: TYPES.Metric }) => void;
 };
 
-export const AddNewKpiModal = ({
+export const AddNewKpiMenu = ({
   closeClick,
   isModal = false,
   workspaceid,
+  onClick,
 }: Props) => {
   const [metrics, setMetrics] = useState<TYPES.Metric[]>();
   const [isDragged, setIsDragged] = useState<Boolean>(false);
@@ -27,17 +29,6 @@ export const AddNewKpiModal = ({
       doFetch();
     }
   }, [doFetch, isModal]);
-
-  useEffect(() => {
-    if (!isModal) return;
-
-    document.body.style.setProperty("overflow", "hidden");
-    document.body.style.top = `-${window.scrollY}px`;
-    return () => {
-      document.body.style.removeProperty("overflow");
-      document.body.style.top = "";
-    };
-  }, [isModal]);
 
   useEffect(() => {
     if (data) {
@@ -98,7 +89,12 @@ export const AddNewKpiModal = ({
 
           {metrics?.map((metric, i) => {
             return (
-              <MetricsInModal key={i} data={metric} isDrag={isDrag}>
+              <MetricsInModal
+                key={i}
+                data={metric}
+                isDrag={isDrag}
+                onClick={onClick}
+              >
                 <MetricChart metric={metric} isVisibleIcons={true} />
               </MetricsInModal>
             );
