@@ -1,3 +1,16 @@
+## Projects
+
+- [Core](./core) - Core Layer
+- [WebClient](./webclient) - Web Client
+- [WebClient E2E Tests](./webclient.e2e) - Web Client End-to-End Tests
+
+### Setup
+```
+git clone https://github.com/yusufeliacik/dashboard-dnd.git
+npm run postinstall
+npm run postrun
+```
+
 ## Repository Branch Strategy
 
 ###### Master - > Main Branch
@@ -11,3 +24,6 @@
 ###### Development Branch Strategy
   - Prefixes: feature/, bugfix/, hotfix/
   - We have to create a new branch for each task.
+  
+ 
+
